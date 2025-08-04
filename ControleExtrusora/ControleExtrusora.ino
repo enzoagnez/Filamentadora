@@ -13,24 +13,24 @@ const double vcc = 5.0;   //tensão em que o termômetro será ligado
 const double R = 10000.0; //resistor que será usado como divisor de tensão
 
 //parametros para o calculo do PID
-double Kp = 0.01;   // Ganho Proporcional
-double Ki = 0.2;   // Ganho Integral
-double Kd = 0.0;   // Ganho Derivativo
+double Kp = 0.01;  // Ganho Proporcional
+double Ki = 0.1;   // Ganho Integral
+double Kd = 0.1;   // Ganho Derivativo com 0.1 ficou bom
 
 
 //parametros de controle zona 1 (pre aquecimento)
-double setpointZona1 = 200; //setpoint da zona 2
+double setpointZona1 = 190;   //setpoint da zona 2
 double temperaturaZona1 = 0;  //temperatura lida na zona 1
-double potenciaZona1 = 0;  //potencia na resistencia da zona 1
-int termometroZona1 = A0; //Pino do termometro da zona1
-int resistenciaZona1 = 5;  //Pino da resistencia da zona1
+double potenciaZona1 = 0;     //potencia na resistencia da zona 1
+int termometroZona1 = A0;     //Pino do termometro da zona1
+int resistenciaZona1 = 5;     //Pino da resistencia da zona1
 
 //parametros de controle zona 2 (bico)
-double setpointZona2 = 230;  //setpoint da zona 2
-double temperaturaZona2 = 0; //temperatura lida na zona 2
-double potenciaZona2 = 0;  //potencia na resistencia da zona 2 
-int termometroZona2 = A1; //Pino do termometro da zona2
-int resistenciaZona2 = 6;  //Pino da resistencia da zona2
+double setpointZona2 = 230;   //setpoint da zona 2
+double temperaturaZona2 = 0;  //temperatura lida na zona 2
+double potenciaZona2 = 0;     //potencia na resistencia da zona 2 
+int termometroZona2 = A1;     //Pino do termometro da zona2
+int resistenciaZona2 = 6;     //Pino da resistencia da zona2
 
 
 PID pidZona1(&temperaturaZona1, &potenciaZona1, &setpointZona1, Kp, Ki, Kd, DIRECT);
@@ -50,11 +50,11 @@ void setup() {
 
   // Configura PID
   pidZona1.SetMode(AUTOMATIC);
-  pidZona1.SetSampleTime(2*amostras*delayAmostras + 1000);  // Intervalo aproximado de amostragem em milissegundos
+  pidZona1.SetSampleTime(2*amostras*delayAmostras);  // Intervalo aproximado de amostragem em milissegundos
   pidZona1.SetOutputLimits(0, 100); 
 
   pidZona2.SetMode(AUTOMATIC);
-  pidZona2.SetSampleTime(amostras*delayAmostras + 1000);  // Intervalo aproximado de amostragem em milissegundos
+  pidZona2.SetSampleTime(amostras*delayAmostras);  // Intervalo aproximado de amostragem em milissegundos
   pidZona2.SetOutputLimits(0, 100); 
 
   Serial.println("Setup Completo");

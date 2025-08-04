@@ -1,7 +1,7 @@
 #define MAX_CHANNELS 8
 #define PWM_PERIOD 500
-#define ZONA_MORTA_MIN 5
-#define ZONA_MORTA_MAX 95
+#define ZONA_MORTA_MIN 2
+#define ZONA_MORTA_MAX 98
 
 struct SoftwarePWM {
   byte pin;
