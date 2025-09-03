@@ -19,14 +19,14 @@ double Kd = 0.1;   // Ganho Derivativo com 0.1 ficou bom
 
 
 //parametros de controle zona 1 (pre aquecimento)
-double setpointZona1 = 190;   //setpoint da zona 2
+double setpointZona1 = 180;   //setpoint da zona 2
 double temperaturaZona1 = 0;  //temperatura lida na zona 1
 double potenciaZona1 = 0;     //potencia na resistencia da zona 1
 int termometroZona1 = A0;     //Pino do termometro da zona1
 int resistenciaZona1 = 5;     //Pino da resistencia da zona1
 
 //parametros de controle zona 2 (bico)
-double setpointZona2 = 230;   //setpoint da zona 2
+double setpointZona2 = 240;   //setpoint da zona 2
 double temperaturaZona2 = 0;  //temperatura lida na zona 2
 double potenciaZona2 = 0;     //potencia na resistencia da zona 2 
 int termometroZona2 = A1;     //Pino do termometro da zona2
