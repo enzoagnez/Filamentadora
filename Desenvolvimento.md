@@ -1,6 +1,6 @@
 # Desenvolvimento do projeto
 
-	## Componentes utilizados
+	# # Componentes utilizados
 		### Aquecimento
 			- 2 Resistencias mica coleira de 25mm 125w 110v
 		### Motor para extrusão 
