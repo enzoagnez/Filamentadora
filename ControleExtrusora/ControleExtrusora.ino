@@ -1,5 +1,7 @@
 #include <PID_v1_bc.h>   //biblioteca para fazer o controle de aquecimento
+#include "HX711.h"
 #include "softwarePWM.h"
+
 
 //parametros do termometro
 #define amostras 20        //numero de leituras reais do termômetro para cada leitura retornada na função temp()
@@ -17,7 +19,6 @@ double Kp = 0.01;  // Ganho Proporcional
 double Ki = 0.1;   // Ganho Integral
 double Kd = 0.1;   // Ganho Derivativo com 0.1 ficou bom
 
-
 //parametros de controle zona 1 (pre aquecimento)
 double setpointZona1 = 220;   //setpoint da zona 2
 double temperaturaZona1 = 0;  //temperatura lida na zona 1
@@ -32,6 +33,19 @@ double potenciaZona2 = 0;     //potencia na resistencia da zona 2
 int termometroZona2 = A1;     //Pino do termometro da zona2
 int resistenciaZona2 = 6;     //Pino da resistencia da zona2
 
+//parametro de controle do tracionador (diametro do filamento)
+double setpointTracionador = 20;  //setpoint da zona 2
+double cargaTracionador = 0;      //temperatura lida na zona 2
+double velocidadeTracionador = 0; //potencia na resistencia da zona 2 
+double KpTracionador = 1.0;
+double KiTracionador = 0.1;
+double KdTracionador = 0.1;
+uint8_t dataPin = 10;
+uint8_t clockPin = 11;
+
+HX711 scale; //celula de carga
+
+PID pidTracionador(&cargaTracionador, &velocidadeTracionador, &setpointTracionador, KpTracionador, KiTracionador, KdTracionador, DIRECT);
 
 PID pidZona1(&temperaturaZona1, &potenciaZona1, &setpointZona1, Kp, Ki, Kd, DIRECT);
 PID pidZona2(&temperaturaZona2, &potenciaZona2, &setpointZona2, Kp, Ki, Kd, DIRECT);
@@ -44,6 +58,12 @@ void setup() {
   digitalWrite(resistenciaZona2, LOW);
   delay(10);
 
+  scale.begin(dataPin, clockPin);
+  //  load cell factor 5 KG
+  scale.set_scale(420.0983);       //  TODO you need to calibrate this yourself.
+  //  reset the scale to zero = 0
+  scale.tare(20);
+
   //configura PWM para controle de potencia das resistencias
   adicionaCanal(resistenciaZona1); 
   adicionaCanal(resistenciaZona2);
@@ -54,8 +74,12 @@ void setup() {
   pidZona1.SetOutputLimits(0, 100); 
 
   pidZona2.SetMode(AUTOMATIC);
-  pidZona2.SetSampleTime(amostras*delayAmostras);  // Intervalo aproximado de amostragem em milissegundos
+  pidZona2.SetSampleTime(2*amostras*delayAmostras);  // Intervalo aproximado de amostragem em milissegundos
   pidZona2.SetOutputLimits(0, 100); 
+
+  pidTracionador.SetMode(AUTOMATIC);
+  pidTracionador.SetSampleTime(2*amostras*delayAmostras);
+  pidTracionador.SetOutputLimits(0,100);
 
   Serial.println("Setup Completo");
 
@@ -85,16 +109,34 @@ void aqc(int resistencia, double potencia){
   delay(500 - potencia);  
 }
 
+double carga(){
+  if (scale.is_ready())
+  {
+    return(scale.get_units(1));
+  }
+
+}
+
+void atualizaVelocidade(){
+  
+}
+
 void loop() {
 
   temperaturaZona1 = temp(termometroZona1);
   temperaturaZona2 = temp(termometroZona2);
 
+  cargaTracionador = carga();
+
   pidZona1.Compute();
   pidZona2.Compute();
 
+  pidTracionador.compute();
+
   atualizaPotencia(resistenciaZona1, potenciaZona1);
   atualizaPotencia(resistenciaZona2, potenciaZona2);
+
+  atualizaVelocidade(velocidadeTracionador);
 
   atualizaPWM();
 
